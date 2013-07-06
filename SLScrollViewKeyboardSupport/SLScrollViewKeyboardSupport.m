@@ -25,7 +25,22 @@
 //
 
 #import "SLScrollViewKeyboardSupport.h"
-#import "UIView+ICModalPresentationViewController.h"
+
+static UIView *findFirstResponderInView(UIView *view)
+{
+    if (view.isFirstResponder) {
+        return view;
+    }
+    
+    for (UIView *subview in view.subviews) {
+        UIView *firstResponder = findFirstResponderInView(subview);
+        if (firstResponder != nil) {
+            return firstResponder;
+        }
+    }
+    
+    return nil;
+}
 
 
 
@@ -63,7 +78,7 @@
 
 - (void)_keyboardWillShowCallback:(NSNotification *)notification
 {
-    UIView *firstResponder = [[UIApplication sharedApplication] keyWindow].findFirstResponder;
+    UIView *firstResponder = findFirstResponderInView([[UIApplication sharedApplication] keyWindow]);
     
     if (![firstResponder isDescendantOfView:self.scrollView]) {
         return;
