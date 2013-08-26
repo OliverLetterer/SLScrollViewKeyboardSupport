@@ -250,6 +250,8 @@ char *const SLScrollViewKeyboardSupportOriginalScrollIndicatorInsets;
     CGFloat duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
     UIViewAnimationOptions options = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] unsignedIntegerValue] | UIViewAnimationOptionBeginFromCurrentState;
     
+    CGRect responderFrame = [firstResponder convertRect:firstResponder.bounds toView:scrollView];
+    
     [UIView animateWithDuration:duration delay:0.0f options:options animations:^{
         UIEdgeInsets additionsEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, CGRectGetHeight(hiddenFrame), 0.0f);
         UIEdgeInsets originalEdgeInsets = scrollView.SLScrollViewKeyboardSupport_originalContentInset;
@@ -262,6 +264,9 @@ char *const SLScrollViewKeyboardSupportOriginalScrollIndicatorInsets;
         scrollView.contentInset = UIEdgeInsetsByAddingInsets(originalEdgeInsets, additionsEdgeInsets);
         scrollView.scrollIndicatorInsets = UIEdgeInsetsByAddingInsets(originalScrollIndicatorInsets, additionsEdgeInsets);
         scrollView.SLScrollViewKeyboardSupport_contentOffsetChangeIsExpected = NO;
+        
+        CGFloat offset = CGRectGetMaxY(responderFrame) - CGRectGetHeight(scrollView.frame) + CGRectGetHeight(keyboardFrame);
+        [scrollView setContentOffset:CGPointMake(0.0f, offset) animated:NO];
     } completion:NULL];
 }
 
