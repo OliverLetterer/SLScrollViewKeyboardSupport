@@ -34,4 +34,7 @@
 @property (nonatomic, weak) UIScrollView *scrollView;
 - (id)initWithScrollView:(UIScrollView *)scrollView;
 
+// Scrolls the scrollview to a certain responder.
+- (void)scrollToResponder:(UIView*)responder;
+
 @end
