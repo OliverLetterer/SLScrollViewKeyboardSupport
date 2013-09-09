@@ -207,7 +207,11 @@ char *const SLScrollViewKeyboardSupportOriginalScrollIndicatorInsets;
 
 @end
 
-
+@interface SLScrollViewKeyboardSupport ()
+@property (nonatomic, assign) CGRect keyboardFrame;
+@property (nonatomic) CGFloat keyboardAnimationDuration;
+@property (nonatomic) NSInteger keyboardAnimationOptions;
+@end
 
 @implementation SLScrollViewKeyboardSupport
 
@@ -231,6 +235,37 @@ char *const SLScrollViewKeyboardSupportOriginalScrollIndicatorInsets;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+#pragma mark - Public methods
+
+- (void)scrollToResponder:(UIView*)responder {
+
+    UIScrollView *scrollView = self.scrollView;
+
+    CGRect hiddenFrame = CGRectIntersection(self.keyboardFrame, scrollView.bounds);
+    
+    CGRect responderFrame = [responder convertRect:responder.bounds toView:scrollView];
+    
+    [UIView animateWithDuration:self.keyboardAnimationDuration
+                          delay:0.0f
+                        options:self.keyboardAnimationOptions
+                     animations:^{
+                         UIEdgeInsets additionsEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, CGRectGetHeight(hiddenFrame), 0.0f);
+                         UIEdgeInsets originalEdgeInsets = scrollView.SLScrollViewKeyboardSupport_originalContentInset;
+                         UIEdgeInsets originalScrollIndicatorInsets = scrollView.SLScrollViewKeyboardSupport_originalScrollIndicatorInsets;
+                         
+                         scrollView.SLScrollViewKeyboardSupport_keyboardSupportContentInset = additionsEdgeInsets;
+                         scrollView.SLScrollViewKeyboardSupport_keyboardSupportScrollIndicatorInsets = additionsEdgeInsets;
+                         
+                         scrollView.SLScrollViewKeyboardSupport_contentOffsetChangeIsExpected = YES;
+                         scrollView.contentInset = UIEdgeInsetsByAddingInsets(originalEdgeInsets, additionsEdgeInsets);
+                         scrollView.scrollIndicatorInsets = UIEdgeInsetsByAddingInsets(originalScrollIndicatorInsets, additionsEdgeInsets);
+                         scrollView.SLScrollViewKeyboardSupport_contentOffsetChangeIsExpected = NO;
+                         
+                         CGFloat offset = CGRectGetMaxY(responderFrame) - CGRectGetHeight(scrollView.frame) + CGRectGetHeight(self.keyboardFrame);
+                         [scrollView setContentOffset:CGPointMake(0.0f, offset) animated:NO];
+                     } completion:NULL];
+}
+
 #pragma mark - Private category implementation ()
 
 - (void)_keyboardWillShowCallback:(NSNotification *)notification
@@ -242,34 +277,15 @@ char *const SLScrollViewKeyboardSupportOriginalScrollIndicatorInsets;
         return;
     }
     
-    CGRect endFrame = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    CGRect tmpRect = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     
-    CGRect keyboardFrame = [[UIApplication sharedApplication].keyWindow convertRect:endFrame toView:scrollView];
+    self.keyboardFrame = [[UIApplication sharedApplication].keyWindow convertRect:tmpRect toView:scrollView];
     
-    CGRect hiddenFrame = CGRectIntersection(keyboardFrame, scrollView.bounds);
-    CGFloat duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
-    UIViewAnimationOptions options = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] unsignedIntegerValue] | UIViewAnimationOptionBeginFromCurrentState;
     
-    CGRect responderFrame = [firstResponder convertRect:firstResponder.bounds toView:scrollView];
-    
-    [UIView animateWithDuration:duration delay:0.0f options:options animations:^{
-        UIEdgeInsets additionsEdgeInsets = UIEdgeInsetsMake(0.0f, 0.0f, CGRectGetHeight(hiddenFrame), 0.0f);
-        UIEdgeInsets originalEdgeInsets = scrollView.SLScrollViewKeyboardSupport_originalContentInset;
-        UIEdgeInsets originalScrollIndicatorInsets = scrollView.SLScrollViewKeyboardSupport_originalScrollIndicatorInsets;
-        
-        scrollView.SLScrollViewKeyboardSupport_keyboardSupportContentInset = additionsEdgeInsets;
-        scrollView.SLScrollViewKeyboardSupport_keyboardSupportScrollIndicatorInsets = additionsEdgeInsets;
-        
-        scrollView.SLScrollViewKeyboardSupport_contentOffsetChangeIsExpected = YES;
-        scrollView.contentInset = UIEdgeInsetsByAddingInsets(originalEdgeInsets, additionsEdgeInsets);
-        scrollView.scrollIndicatorInsets = UIEdgeInsetsByAddingInsets(originalScrollIndicatorInsets, additionsEdgeInsets);
-        scrollView.SLScrollViewKeyboardSupport_contentOffsetChangeIsExpected = NO;
-        
-        if (CGRectIntersectsRect(responderFrame, keyboardFrame)) {
-            CGFloat offset = CGRectGetMaxY(responderFrame) - CGRectGetHeight(scrollView.frame) + CGRectGetHeight(keyboardFrame);
-            [scrollView setContentOffset:CGPointMake(0.0f, offset) animated:NO];
-        }
-    } completion:NULL];
+    self.keyboardAnimationDuration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
+    self.keyboardAnimationOptions = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] unsignedIntegerValue] | UIViewAnimationOptionBeginFromCurrentState;
+
+    [self scrollToResponder:firstResponder];
 }
 
 - (void)_keyboardWillHideCallback:(NSNotification *)notification
