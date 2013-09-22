@@ -285,7 +285,7 @@ char *const SLScrollViewKeyboardSupportOriginalScrollIndicatorInsets;
     self.keyboardAnimationDuration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
     self.keyboardAnimationOptions = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] unsignedIntegerValue] | UIViewAnimationOptionBeginFromCurrentState;
 
-    [self scrollToResponder:firstResponder];
+    [self scrollToResponder:self.fixedResponder ?: firstResponder];
 }
 
 - (void)_keyboardWillHideCallback:(NSNotification *)notification

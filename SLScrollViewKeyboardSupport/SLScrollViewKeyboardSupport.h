@@ -37,4 +37,6 @@
 // Scrolls the scrollview to a certain responder.
 - (void)scrollToResponder:(UIView*)responder;
 
+@property (nonatomic, weak) UIView *fixedResponder;
+
 @end
