@@ -3,7 +3,7 @@
 //  SLScrollViewKeyboardSupport
 //
 //  The MIT License (MIT)
-//  Copyright (c) 2013 Oliver Letterer, Sparrow-Labs
+//  Copyright (c) 2013-2015 Oliver Letterer, Sparrow-Labs
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,17 @@
 //  THE SOFTWARE.
 //
 
+#import <UIKit/UIKit.h>
 
 
-/**
- @abstract  <#abstract comment#>
- */
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface SLScrollViewKeyboardSupport : NSObject
 
 @property (nonatomic, weak) UIScrollView *scrollView;
-- (id)initWithScrollView:(UIScrollView *)scrollView;
+- (instancetype)initWithScrollView:(UIScrollView *)scrollView;
 
 @end
+
+NS_ASSUME_NONNULL_END
