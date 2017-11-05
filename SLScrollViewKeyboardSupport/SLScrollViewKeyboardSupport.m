@@ -242,13 +242,13 @@ char *const SLScrollViewKeyboardSupportOriginalScrollIndicatorInsets;
         return;
     }
 
-    CGRect endFrame = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    CGRect endFrame = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
 
     CGRect keyboardFrame = [[UIApplication sharedApplication].keyWindow convertRect:endFrame toView:scrollView];
 
     CGRect hiddenFrame = CGRectIntersection(keyboardFrame, scrollView.bounds);
-    CGFloat duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
-    UIViewAnimationOptions options = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] unsignedIntegerValue] | UIViewAnimationOptionBeginFromCurrentState;
+    CGFloat duration = [[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] floatValue];
+    UIViewAnimationOptions options = [[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] unsignedIntegerValue] | UIViewAnimationOptionBeginFromCurrentState;
 
     CGRect responderFrame = [firstResponder convertRect:firstResponder.bounds toView:scrollView];
 
@@ -276,8 +276,8 @@ char *const SLScrollViewKeyboardSupportOriginalScrollIndicatorInsets;
 {
     UIScrollView *scrollView = self.scrollView;
 
-    CGFloat duration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] floatValue];
-    UIViewAnimationOptions options = [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey] unsignedIntegerValue] | UIViewAnimationOptionBeginFromCurrentState;
+    CGFloat duration = [[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] floatValue];
+    UIViewAnimationOptions options = [[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] unsignedIntegerValue] | UIViewAnimationOptionBeginFromCurrentState;
 
     [UIView animateWithDuration:duration delay:0.0f options:options animations:^{
         scrollView.SLScrollViewKeyboardSupport_keyboardSupportContentInset = UIEdgeInsetsZero;
